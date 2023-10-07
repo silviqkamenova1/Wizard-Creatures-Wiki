@@ -1,21 +1,20 @@
-                <div class="my-container">
-                    <!-- If there are own posts for wildlife in the database display each of them -->
+    
                     <div class="my-card">
                         <div class="card-header">
-                            <img src="{{image}}" alt="water_fall" />
+                            <img src="{{image}}"/>
                         </div>
                         <div class="card-body">
-                            <span class="tag tag-teal">Keyword: {{keyword}}</span>
+                            <span class="tag tag-teal">Species:{{species}}</span>
                             <h4>
-                                Title: {{title}}
+                                Name:{{name}}
                             </h4>
                             <div class="user">
-                                <img src="https://snworksceo.imgix.net/dtc/3f23c937-0065-4e17-8daa-46449777caed.sized-1000x1000.jpg?w=1000" alt="vote" />
                                 <div class="user-info">
-                                    <h5>Author:  {{author.firstName}} {{author.lastName}}</h5>
-                                    <small>Rating of votes: -5</small>
+                                    <h5>Author: {{owner.firstName}} {{owner.lastName}}</h5>
+                                    <small>Rating of votes: {{votes.length}}</small>
+                                    <a href="/wiki/{{_id}}/details" class="details_btn">Details</a>
+                                    
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>

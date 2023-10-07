@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         minLength: [3, "First name must be at least 3 characters"],
-        //required:  [true, 'First name is required'],
+        required:  [true, 'First name is required'],
         validate: {
             validator(value){
                 return NAME_PATTERN.test(value)
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     },
     lastName: {
         type: String,
-        minLength: [5, "First name must be at least 5 characters"],
+        minLength: [3, "First name must be at least 5 characters"],
         //required: [true, 'Last name is required'],
         validate: {
             validator(value){
@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
+        minLength: [10, "Email name must be at least 5 characters"],
         required: [true, 'Email is required'],
         validate: {
             validator(value){
@@ -38,11 +39,7 @@ const userSchema = new mongoose.Schema({
         minLength: [4, 'Password must be at least 4 characters'],
         required: [true, 'Password is required'],
     },
-    myPosts: [{
-        type: mongoose.Types.ObjectId,
-        //minLength: 20,
-        ref: 'PostModel',
-    }],
+
 })
 const User = mongoose.model('User', userSchema);
 module.exports = User;

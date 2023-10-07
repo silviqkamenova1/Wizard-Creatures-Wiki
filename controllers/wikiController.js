@@ -2,80 +2,79 @@ const router = require('express').Router();
 const mongoose = require('mongoose');
 
 const { isAuth } = require('../middlewares/authMiddleware');
-const publicationService = require('../services/publicationService');
+const wikiService = require('../services/wikiService');
 const { getErrorMessage } = require('../utils/errorutils');
 
 
 router.get('/catalog', async (req, res) => {
 
-    const photo = await publicationService.getAll();
-    res.render('photo/catalog', { photo });
+    const creatures = await wikiService.getAll();
+    res.render('wiki/catalog', { creatures });
 });
 
-router.get('/profile', async (req, res) => {
-
-    const data = await publicationService.getPostByAuthor(req.user._id);
-    console.log(data);
-    res.render('photo/profile', { ...data });
-});
-
-router.get('/:photoId/details', async (req, res) => {
-    const photo = await publicationService.getOneDetailed(req.params.photoId).lean();
-    ObjectId = photo.author._id;
-    const isOwner = ObjectId.toString() == req.user?._id;
-    const isVote = photo.votesOnPost?.some(id => id == req.user?._id);
-
-    res.render('photo/details', { ...photo, isOwner, isVote });
-});
-
-router.get('/vote/:photoId/:type', isAuth, async (req, res) => {
-    const value = req.params.type == 'upvote' ? 1 : -1;
-    const userEmail = req.user.email;
+router.post('/create', isAuth, async (req, res) => {
+    const creatureData = req.body;
 
     try {
-        const data = await publicationService.vote(req.user._id, req.params.photoId, value);
+        await wikiService.create(req.user._id, creatureData);
+    } catch (error) {
+        return res.status(400).render('wiki/create', { error: getErrorMessage(error) });
+    }
 
-        res.redirect(`/photo/${req.params.photoId}/details`);
+    res.redirect('/wiki/catalog');
+});
+
+router.get('/:creatureId/details', async (req, res) => {
+    const creature = await wikiService.getOneDetailed(req.params.creatureId).lean();
+    console.log(creature);
+    ObjectId = creature.owner._id;
+    const isOwner = ObjectId.toString() == req.user?._id;
+    const isVote = creature.votes?.some(id => id == req.user?._id);
+
+    res.render('wiki/details', { ...creature, isOwner, isVote });
+});
+
+router.get('/:creatureId/vote', isAuth, async (req, res) => {
+    const value = req.params.type == 'vote' ? 1 : '';
+    try {
+        const data = await wikiService.vote(req.user._id, req.params.creatureId, value);
+
+        res.redirect(`/wiki/${req.params.creatureId}/details`);
     } catch (error) {
         console.log(error);
         return res.render('404');
     }
 
 });
-
-router.get('/:photoId/edit', isAuth, async (req, res) => {
-    const photo = await publicationService.getOne(req.params.photoId);
-
-    res.render('photo/edit', { ...photo });
+router.get('/:creatureId/edit', isAuth, async (req, res) => {
+    const creature = await wikiService.getOne(req.params.creatureId);
+    console.log(creature);
+    res.render('wiki/edit', { ...creature });
 });
 
-router.post('/:photoId/edit', isAuth, async (req, res) => {
-    await publicationService.edit(req.params.photoId, req.body);
+router.post('/:creatureId/edit', isAuth, async (req, res) => {
+    await wikiService.edit(req.params.creatureId, req.body);
 
-    res.redirect(`/photo/${req.params.photoId}/details`);
+    res.redirect(`/wiki/${req.params.creatureId}/details`);
+});
+
+router.get('/profile', async (req, res) => {
+
+    const data = await wikiService.getPostByAuthor(req.user._id).lean();
+    console.log(data);
+    res.render('wiki/profile', { data });
 });
 
 
 router.get('/create', isAuth, (req, res) => {
-    res.render('photo/create');
+    res.render('wiki/create');
 });
 
-router.post('/create', isAuth, async (req, res) => {
-    const photoData = req.body;
 
-    try {
-        await publicationService.create(req.user._id, photoData);
-    } catch (error) {
-        return res.status(400).render('photo/create', { error: getErrorMessage(error) });
-    }
+router.get('/:creatureId/delete', isAuth, async (req, res) => {
 
-    res.redirect('/photo/catalog');
-});
-
-router.get('/:photoId/delete', isAuth, async (req, res) => {
-
-    await publicationService.delete(req.params.photoId);
-    res.redirect('/photo/catalog');
+    await wikiService.delete(req.params.creatureId);
+    res.redirect('/wiki/catalog');
 });
 
 

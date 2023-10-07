@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const jwt = require('../lib/jsonwebtoken');
 const { SECRET } = require('../constants');
 
 exports.authentication = async (req, res, next) =>{
@@ -6,7 +6,7 @@ exports.authentication = async (req, res, next) =>{
 
     if(token) {
         try{
-         const decodedToken = jwt.verify(token, SECRET);
+         const decodedToken = await jwt.verify(token, SECRET);
          req.user = decodedToken;
          res.locals.isAuthenticated = true;
          res.locals.user = decodedToken;
